@@ -16,7 +16,6 @@ ns.db.minimap = ns.db.minimap or {
 local myLDB = LDB:NewDataObject(addonName, {
     type = "launcher",
     text = addonName,
-    -- icon = "Interface\\Icons\\INV_Misc_QuestionMark",
     icon = "Interface\\Icons\\inv12_jewelrytrinkets_devouring_host_currency3_silver",
     
     OnClick = function(self, button)

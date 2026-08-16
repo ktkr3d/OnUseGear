@@ -1,5 +1,7 @@
 local addonName, ns = ...
 
+local icon = LibStub:GetLibrary("LibDBIcon-1.0", true)
+
 -------------------------------------------------------------------------------
 -- Constants & Slot Definitions
 -------------------------------------------------------------------------------
@@ -244,6 +246,12 @@ local function CreateOptionsGUI()
         if not p.Minimap then p.Minimap = { hide = false, minimapPos = 45 } end
         p.Minimap.hide = self:GetChecked()
         -- UpdateMinimapButton()
+        ns.db.minimap.hide = not ns.db.minimap.hide
+        if ns.db.minimap.hide then
+            icon:Hide(addonName)
+        else
+            icon:Show(addonName)
+        end
     end)
 
     -- Size Input Label

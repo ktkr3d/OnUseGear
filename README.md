@@ -6,7 +6,7 @@ OnUseGear is an add-on for usable gear.
 
 ## Install
 
-1. Install MyUsableItems using the [WowUp](https://wowup.io/guide/get-addons/overview) app.
+1. Install OnUseGear using the [WowUp](https://wowup.io/guide/get-addons/overview) app.
 
   ```text
   https://github.com/ktkr3d/OnUseGear

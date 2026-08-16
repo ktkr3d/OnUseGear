@@ -1,6 +1,6 @@
 ## Interface: 120100
 ## Title: OnUseGear
-## Version: v0.1.0
+## Version: v0.1.1
 ## Notes: Displays equipped usable gear with advanced features
 ## Author: ktkr3d
 ## SavedVariablesPerCharacter: OnUseGearPosition

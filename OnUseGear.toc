@@ -1,0 +1,17 @@
+## Interface: 120100
+## Title: OnUseGear
+## Version: v0.1.0
+## Notes: Displays equipped usable gear with advanced features
+## Author: ktkr3d
+## SavedVariablesPerCharacter: OnUseGearPosition
+## IconTexture: Interface\Icons\inv12_jewelrytrinkets_devouring_host_currency3_silver
+## Category: Action Bars
+## SavedVariables: OnUseGearDB
+
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+
+MinimapButton.lua
+Core.lua

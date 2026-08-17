@@ -2,24 +2,19 @@
 
 ## Introduction
 
-OnUseGear is an add-on for usable gear.
+OnUseGear is an add-on for equipped gear with on-use effects.
 
 ## Install
 
-1. Install OnUseGear using the [WowUp](https://wowup.io/guide/get-addons/overview) app.
+Install OnUseGear using the [WowUp](https://wowup.io/guide/get-addons/overview) app.
+`Get Addons` > `Install from URL`
 
-  ```text
-  https://github.com/ktkr3d/OnUseGear
-  ```
+   ```text
+   https://github.com/ktkr3d/OnUseGear
+   ```
 
 ## Configuration
 
-```text
-/oug - Open configuration GUI
-```
-
-## Toggle lock state
-
-```text
-/oug lock - Toggle lock state
-```
+   ```text
+   /oug
+   ```

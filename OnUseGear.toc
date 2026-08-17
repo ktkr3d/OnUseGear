@@ -1,7 +1,7 @@
 ## Interface: 120100
 ## Title: OnUseGear
-## Version: v0.1.1
-## Notes: Displays equipped usable gear with advanced features
+## Version: v0.1.2
+## Notes: An add-on for equipped gear with on-use effects
 ## Author: ktkr3d
 ## SavedVariablesPerCharacter: OnUseGearPosition
 ## IconTexture: Interface\Icons\inv12_jewelrytrinkets_devouring_host_currency3_silver

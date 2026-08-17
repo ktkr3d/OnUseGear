@@ -1,13 +1,12 @@
 local addonName, ns = ...
 
-local icon = LibStub:GetLibrary("LibDBIcon-1.0", true)
-
 -------------------------------------------------------------------------------
 -- Constants & Slot Definitions
 -------------------------------------------------------------------------------
 local SLOTS = { 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 }
 local slotButtons = {}
 local profileDropdownFrame -- Custom frame object for the dropdown UI
+local MAX_KEYBIND_SLOTS = 8  -- Key Bindings UIに登録したスロット数
 
 -- Default addon configurations
 local DEFAULT_PROFILE = {
@@ -111,6 +110,7 @@ local function UpdateOnUseGear()
         if itemID and C_Item.GetItemSpell(itemID) then
             activeCount = activeCount + 1
             local btn = slotButtons[slotID]
+            btn.activeIndex = activeCount
             
             btn:SetSize(p.ButtonSize, p.ButtonSize)
             btn.icon:SetTexture(GetItemIcon(itemID))
@@ -122,6 +122,10 @@ local function UpdateOnUseGear()
                 btn:SetPoint("LEFT", mainFrame, "LEFT", offset, 0)
             end
             btn:Show()
+        else
+            if slotButtons[slotID] then
+                slotButtons[slotID].activeIndex = nil
+            end
         end
     end
     
@@ -139,6 +143,43 @@ local function UpdateOnUseGear()
     UpdateButtonCooldowns()
 end
 
+-------------------------------------------------------------------------------
+-- Keybind Application
+-------------------------------------------------------------------------------
+local function ApplyKeybinds()
+    if InCombatLockdown() then return end
+
+    for _, slotID in ipairs(SLOTS) do
+        local btn = slotButtons[slotID]
+        if btn and btn.activeIndex then
+            local idx = btn.activeIndex
+            if idx <= MAX_KEYBIND_SLOTS then
+                local bindingName = "CLICK OnUseGearSlotButton" .. slotID .. ":LeftButton"
+                local key1, key2 = GetBindingKey("OnUseGear_SLOT" .. idx)
+                if key1 then
+                    SetOverrideBinding(mainFrame, true, key1, bindingName)
+                end
+                if key2 then
+                    SetOverrideBinding(mainFrame, true, key2, bindingName)
+                end
+                local displayKey = key1 and GetBindingText(key1, "KEY_") or ""
+                if btn.keybindText then
+                    btn.keybindText:SetText(displayKey)
+                end
+            end
+        end
+    end
+end
+
+local function ClearKeybinds()
+    ClearOverrideBindings(mainFrame)
+    for _, btn in pairs(slotButtons) do
+        if btn.keybindText then
+            btn.keybindText:SetText("")
+        end
+    end
+end
+
 local function RefreshLayoutAndLock()
     local p = GetProfile()
     if p.Locked then
@@ -150,6 +191,7 @@ local function RefreshLayoutAndLock()
     mainFrame:ClearAllPoints()
     mainFrame:SetPoint(p.Position.point, UIParent, p.Position.relativePoint, p.Position.x, p.Position.y)
     UpdateOnUseGear()
+    ApplyKeybinds()
 end
 
 -- Drag Scripts Setup
@@ -178,6 +220,11 @@ local function InitializeButtons()
         local icon = btn:CreateTexture(nil, "BACKGROUND")
         icon:SetAllPoints()
         btn.icon = icon
+        
+        local keybindText = btn:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
+        keybindText:SetPoint("TOPRIGHT", btn, "TOPRIGHT", -2, -2)
+        keybindText:SetTextColor(1, 1, 1, 0.9)
+        btn.keybindText = keybindText
         
         local cd = CreateFrame("Cooldown", name .. "Cooldown", btn, "CooldownFrameTemplate")
         cd:SetAllPoints()
@@ -246,12 +293,6 @@ local function CreateOptionsGUI()
         if not p.Minimap then p.Minimap = { hide = false, minimapPos = 45 } end
         p.Minimap.hide = self:GetChecked()
         -- UpdateMinimapButton()
-        ns.db.minimap.hide = not ns.db.minimap.hide
-        if ns.db.minimap.hide then
-            icon:Hide(addonName)
-        else
-            icon:Show(addonName)
-        end
     end)
 
     -- Size Input Label
@@ -360,6 +401,8 @@ mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 mainFrame:RegisterEvent("UNIT_INVENTORY_CHANGED")
 mainFrame:RegisterEvent("BAG_UPDATE_COOLDOWN")
 mainFrame:RegisterEvent("ADDON_LOADED")
+mainFrame:RegisterEvent("UPDATE_BINDINGS")
+mainFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 
 mainFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == "OnUseGear" then
@@ -371,14 +414,20 @@ mainFrame:SetScript("OnEvent", function(self, event, arg1)
         mainFrame:UnregisterEvent("ADDON_LOADED")
     elseif event == "BAG_UPDATE_COOLDOWN" then
         UpdateButtonCooldowns()
+    elseif event == "UPDATE_BINDINGS" then
+        ApplyKeybinds()
+    elseif event == "PLAYER_REGEN_DISABLED" then
+        --
     elseif event == "PLAYER_ENTERING_WORLD" or (event == "UNIT_INVENTORY_CHANGED" and arg1 == "player") then
         if not InCombatLockdown() then
             UpdateOnUseGear()
+            ApplyKeybinds()
         else
             mainFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
         end
     elseif event == "PLAYER_REGEN_ENABLED" then
         UpdateOnUseGear()
+        ApplyKeybinds()
         mainFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
     end
 end)

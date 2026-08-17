@@ -1,0 +1,6 @@
+<Bindings>
+    <Binding name="OnUseGear_SLOT1"  description="OnUseGear: Slot 1" category="OnUseGear" />
+    <Binding name="OnUseGear_SLOT2"  description="OnUseGear: Slot 2" category="OnUseGear" />
+    <Binding name="OnUseGear_SLOT3"  description="OnUseGear: Slot 3" category="OnUseGear" />
+    <Binding name="OnUseGear_SLOT4"  description="OnUseGear: Slot 4" category="OnUseGear" />
+</Bindings>

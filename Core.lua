@@ -5,8 +5,8 @@ local addonName, ns = ...
 -------------------------------------------------------------------------------
 local SLOTS = { 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 }
 local slotButtons = {}
-local profileDropdownFrame -- Custom frame object for the dropdown UI
-local MAX_KEYBIND_SLOTS = 8  -- Key Bindings UIに登録したスロット数
+local profileDropdownFrame
+local MAX_KEYBIND_SLOTS = 8
 
 -- Default addon configurations
 local DEFAULT_PROFILE = {

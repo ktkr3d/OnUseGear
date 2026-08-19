@@ -49,8 +49,14 @@ dragHandle:RegisterForDrag("LeftButton")
 local currentProfileKey
 
 local function GetProfile()
-    if not OnUseGearDB then 
-        OnUseGearDB = { profiles = {}, charToProfile = {}, minimapButton = { name = "OnUseGear", hide = false, minimapPos = 45, radius = 80, lock = false } } 
+    if not OnUseGearDB then
+        OnUseGearDB = {}
+    end
+    if not OnUseGearDB.profiles then
+        OnUseGearDB.profiles = {}
+    end
+    if not OnUseGearDB.charToProfile then
+        OnUseGearDB.charToProfile = {}
     end
     if not OnUseGearDB.minimapButton then
         OnUseGearDB.minimapButton = { name = "OnUseGear", hide = false, minimapPos = 45, radius = 80, lock = false }
@@ -408,7 +414,7 @@ end
 -- Event Listeners
 -------------------------------------------------------------------------------
 mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-mainFrame:RegisterEvent("UNIT_INVENTORY_CHANGED")
+mainFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 mainFrame:RegisterEvent("BAG_UPDATE_COOLDOWN")
 mainFrame:RegisterEvent("ADDON_LOADED")
 mainFrame:RegisterEvent("UPDATE_BINDINGS")
@@ -418,7 +424,6 @@ mainFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == "OnUseGear" then
         GetProfile()
         InitializeButtons()
-        -- UpdateMinimapButton()
         CreateOptionsGUI()
         RefreshLayoutAndLock()
         mainFrame:UnregisterEvent("ADDON_LOADED")
@@ -428,7 +433,7 @@ mainFrame:SetScript("OnEvent", function(self, event, arg1)
         ApplyKeybinds()
     elseif event == "PLAYER_REGEN_DISABLED" then
         --
-    elseif event == "PLAYER_ENTERING_WORLD" or (event == "UNIT_INVENTORY_CHANGED" and arg1 == "player") then
+    elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_EQUIPMENT_CHANGED" then
         if not InCombatLockdown() then
             UpdateOnUseGear()
             ApplyKeybinds()

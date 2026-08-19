@@ -433,7 +433,18 @@ mainFrame:SetScript("OnEvent", function(self, event, arg1)
         ApplyKeybinds()
     elseif event == "PLAYER_REGEN_DISABLED" then
         --
-    elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_EQUIPMENT_CHANGED" then
+    elseif event == "PLAYER_ENTERING_WORLD" then
+        -- Delay by one frame: item data may not be ready immediately after a
+        -- zone transition / teleport when this event fires.
+        C_Timer.After(0, function()
+            if not InCombatLockdown() then
+                UpdateOnUseGear()
+                ApplyKeybinds()
+            else
+                mainFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+            end
+        end)
+    elseif event == "PLAYER_EQUIPMENT_CHANGED" then
         if not InCombatLockdown() then
             UpdateOnUseGear()
             ApplyKeybinds()

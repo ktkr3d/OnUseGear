@@ -8,15 +8,9 @@ local icon = LibStub:GetLibrary("LibDBIcon-1.0", true)
 
 if not LDB or not icon then return end
 
-ns.db = ns.db or {}
-ns.db.minimap = ns.db.minimap or {
-    hide = false,
-}
-
 local myLDB = LDB:NewDataObject(addonName, {
     type = "launcher",
     text = addonName,
-    -- icon = "Interface\\Icons\\INV_Misc_QuestionMark",
     icon = "Interface\\Icons\\inv12_jewelrytrinkets_devouring_host_currency3_silver",
     
     OnClick = function(self, button)
@@ -34,4 +28,18 @@ local myLDB = LDB:NewDataObject(addonName, {
     end,
 })
 
-icon:Register(addonName, myLDB, ns.db.minimap)
+local minimapFrame = CreateFrame("Frame")
+minimapFrame:RegisterEvent("ADDON_LOADED")
+minimapFrame:SetScript("OnEvent", function(self, event, arg1)
+    if event == "ADDON_LOADED" and arg1 == addonName then
+        if not OnUseGearDB then
+            OnUseGearDB = {}
+        end
+        if not OnUseGearDB.minimapButton then
+            OnUseGearDB.minimapButton = { hide = false, minimapPos = 45, radius = 80, lock = false }
+        end
+
+        icon:Register(addonName, myLDB, OnUseGearDB.minimapButton)
+        self:UnregisterEvent("ADDON_LOADED")
+    end
+end)

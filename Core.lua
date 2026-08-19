@@ -1,5 +1,9 @@
 local addonName, ns = ...
 
+local LibStub = _G.LibStub
+if not LibStub then return end
+
+local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
 local icon = LibStub:GetLibrary("LibDBIcon-1.0", true)
 
 -------------------------------------------------------------------------------
@@ -18,7 +22,7 @@ local DEFAULT_PROFILE = {
     OpacityCD   = 0.6,
     Locked      = false,
     Position    = { point = "CENTER", relativePoint = "CENTER", x = 0, y = -200 },
-    Minimap     = { hide = false, minimapPos = 45, radius = 80, lock = false }
+    minimap     = { hide = false }
 }
 
 -------------------------------------------------------------------------------
@@ -61,8 +65,6 @@ local function GetProfile()
     
     if not OnUseGearDB.profiles[currentProfileKey] then
         OnUseGearDB.profiles[currentProfileKey] = CopyTable(DEFAULT_PROFILE)
-    elseif not OnUseGearDB.profiles[currentProfileKey].Minimap then
-        OnUseGearDB.profiles[currentProfileKey].Minimap = CopyTable(DEFAULT_PROFILE.Minimap)
     end
 
     OnUseGearDB.minimapButton.name = "OnUseGear"
@@ -290,12 +292,13 @@ local function CreateOptionsGUI()
     local minimapCheck = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
     minimapCheck:SetPoint("TOPLEFT", verticalCheck, "BOTTOMLEFT", 0, -8)
     minimapCheck.Text:SetText("Hide Minimap Button")
-    minimapCheck:SetChecked(p.Minimap and p.Minimap.hide)
+    minimapCheck:SetChecked(OnUseGearDB and OnUseGearDB.minimapButton and OnUseGearDB.minimapButton.hide)
     minimapCheck:SetScript("OnClick", function(self)
-        if not p.Minimap then p.Minimap = { hide = false, minimapPos = 45 } end
-        p.Minimap.hide = self:GetChecked()
-        ns.db.minimap.hide = self:GetChecked()
-        if ns.db.minimap.hide then
+        local checked = self:GetChecked()
+        if OnUseGearDB and OnUseGearDB.minimapButton then
+            OnUseGearDB.minimapButton.hide = checked
+        end
+        if checked then
             icon:Hide(addonName)
         else
             icon:Show(addonName)
@@ -371,7 +374,7 @@ local function CreateOptionsGUI()
         local currentP = GetProfile()
         lockCheck:SetChecked(currentP.Locked)
         verticalCheck:SetChecked(currentP.IsVertical)
-        minimapCheck:SetChecked(currentP.Minimap and currentP.Minimap.hide)
+        minimapCheck:SetChecked(OnUseGearDB and OnUseGearDB.minimapButton and OnUseGearDB.minimapButton.hide)
         if currentP and currentP.ButtonSize then
             sizeInput:SetText(tostring(currentP.ButtonSize))
             sizeInput:SetCursorPosition(0)
@@ -438,3 +441,4 @@ mainFrame:SetScript("OnEvent", function(self, event, arg1)
         mainFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
     end
 end)
+

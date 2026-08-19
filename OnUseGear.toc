@@ -3,7 +3,6 @@
 ## Version: v0.1.3
 ## Notes: An add-on for equipped gear with on-use effects
 ## Author: ktkr3d
-## SavedVariablesPerCharacter: OnUseGearPosition
 ## IconTexture: Interface\Icons\inv12_jewelrytrinkets_devouring_host_currency3_silver
 ## Category: Action Bars
 ## SavedVariables: OnUseGearDB

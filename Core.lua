@@ -457,4 +457,3 @@ mainFrame:SetScript("OnEvent", function(self, event, arg1)
         mainFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
     end
 end)
-

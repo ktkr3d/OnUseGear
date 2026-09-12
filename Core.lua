@@ -19,6 +19,7 @@ local DEFAULT_PROFILE = {
     ButtonSize  = 45,
     Spacing     = 6,
     IsVertical  = false,
+    HideTooltipInCombat = false,
     OpacityCD   = 0.6,
     Locked      = false,
     Position    = { point = "CENTER", relativePoint = "CENTER", x = 0, y = -200 },
@@ -243,6 +244,8 @@ local function InitializeButtons()
         
         btn:SetScript("OnEnter", function(self)
             SetHandleAlpha(1.0)
+            local p = GetProfile()
+            if p.HideTooltipInCombat and InCombatLockdown() then return end
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetInventoryItem("player", slotID)
             GameTooltip:Show()
@@ -294,9 +297,22 @@ local function CreateOptionsGUI()
         UpdateOnUseGear()
     end)
 
+    -- Combat Tooltip Checkbox
+    local combatTooltipCheck = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
+    combatTooltipCheck:SetPoint("TOPLEFT", verticalCheck, "BOTTOMLEFT", 0, -8)
+    combatTooltipCheck.Text:SetText("Hide Tooltips in Combat")
+    combatTooltipCheck:SetChecked(p.HideTooltipInCombat)
+    combatTooltipCheck:SetScript("OnClick", function(self)
+        local currentP = GetProfile()
+        currentP.HideTooltipInCombat = self:GetChecked()
+        if currentP.HideTooltipInCombat and InCombatLockdown() then
+            GameTooltip:Hide()
+        end
+    end)
+
     -- Minimap Checkbox
     local minimapCheck = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
-    minimapCheck:SetPoint("TOPLEFT", verticalCheck, "BOTTOMLEFT", 0, -8)
+    minimapCheck:SetPoint("TOPLEFT", combatTooltipCheck, "BOTTOMLEFT", 0, -8)
     minimapCheck.Text:SetText("Hide Minimap Button")
     minimapCheck:SetChecked(OnUseGearDB and OnUseGearDB.minimapButton and OnUseGearDB.minimapButton.hide)
     minimapCheck:SetScript("OnClick", function(self)
@@ -380,6 +396,7 @@ local function CreateOptionsGUI()
         local currentP = GetProfile()
         lockCheck:SetChecked(currentP.Locked)
         verticalCheck:SetChecked(currentP.IsVertical)
+        combatTooltipCheck:SetChecked(currentP.HideTooltipInCombat)
         minimapCheck:SetChecked(OnUseGearDB and OnUseGearDB.minimapButton and OnUseGearDB.minimapButton.hide)
         if currentP and currentP.ButtonSize then
             sizeInput:SetText(tostring(currentP.ButtonSize))
@@ -432,7 +449,9 @@ mainFrame:SetScript("OnEvent", function(self, event, arg1)
     elseif event == "UPDATE_BINDINGS" then
         ApplyKeybinds()
     elseif event == "PLAYER_REGEN_DISABLED" then
-        --
+        if GetProfile().HideTooltipInCombat then
+            GameTooltip:Hide()
+        end
     elseif event == "PLAYER_ENTERING_WORLD" then
         -- Delay by one frame: item data may not be ready immediately after a
         -- zone transition / teleport when this event fires.

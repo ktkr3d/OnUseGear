@@ -124,7 +124,7 @@ local function UpdateOnUseGear()
             btn.activeIndex = activeCount
             
             btn:SetSize(p.ButtonSize, p.ButtonSize)
-            btn.icon:SetTexture(GetItemIcon(itemID))
+            btn.icon:SetTexture(C_Item.GetItemIconByID(itemID))
             
             local offset = (activeCount - 1) * (p.ButtonSize + p.Spacing)
             if p.IsVertical then

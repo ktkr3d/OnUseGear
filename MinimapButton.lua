@@ -15,7 +15,7 @@ local myLDB = LDB:NewDataObject(addonName, {
     
     OnClick = function(self, button)
         if button == "LeftButton" then
-            SlashCmdList["OnUseGear"]()
+            ns.ToggleOptionsWindow()
         elseif button == "RightButton" then
             SlashCmdList["OnUseGear"]("lock")
         end
@@ -23,7 +23,7 @@ local myLDB = LDB:NewDataObject(addonName, {
     
     OnTooltipShow = function(tooltip)
         tooltip:AddLine(addonName, 1, 1, 1)
-        tooltip:AddLine("|cff00ff00Left Click:|r Open Settings", 0.8, 0.8, 0.8)
+        tooltip:AddLine("|cff00ff00Left Click:|r Toggle Settings", 0.8, 0.8, 0.8)
         tooltip:AddLine("|cff00ff00Right Click:|r Toggle lock state", 0.8, 0.8, 0.8)
     end,
 })

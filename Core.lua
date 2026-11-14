@@ -267,38 +267,61 @@ end
 -------------------------------------------------------------------------------
 -- GUI Options Settings Panel
 -------------------------------------------------------------------------------
-local optionsPanel = CreateFrame("Frame", "OnUseGearOptionsPanel", UIParent)
-optionsPanel.name = "OnUseGear"
+local optionsWindow = CreateFrame("Frame", "OnUseGearOptionsWindow", UIParent, "BasicFrameTemplateWithInset")
+optionsWindow:SetSize(420, 300)
+optionsWindow:SetPoint("CENTER")
+optionsWindow:SetFrameStrata("DIALOG")
+optionsWindow:SetClampedToScreen(true)
+optionsWindow:SetMovable(true)
+optionsWindow:EnableMouse(true)
+optionsWindow:Hide()
+
+if optionsWindow.TitleText then
+    optionsWindow.TitleText:Hide()
+end
+
+local titleBar = CreateFrame("Frame", nil, optionsWindow)
+titleBar:SetPoint("TOPLEFT", optionsWindow, "TOPLEFT", 8, -2)
+titleBar:SetPoint("TOPRIGHT", optionsWindow, "TOPRIGHT", -36, -2)
+titleBar:SetHeight(30)
+titleBar:EnableMouse(true)
+titleBar:RegisterForDrag("LeftButton")
+titleBar:SetScript("OnDragStart", function()
+    optionsWindow:StartMoving()
+end)
+titleBar:SetScript("OnDragStop", function()
+    optionsWindow:StopMovingOrSizing()
+end)
+
+local title = titleBar:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+title:SetPoint("LEFT", 8, 0)
+title:SetText("OnUseGear Settings")
 
 local function CreateOptionsGUI()
     local p = GetProfile()
-    
-    local title = optionsPanel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-    title:SetPoint("TOPLEFT", 16, -16)
-    title:SetText("OnUseGear Settings")
 
     -- Lock Checkbox
-    local lockCheck = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
-    lockCheck:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -16)
+    local lockCheck = CreateFrame("CheckButton", nil, optionsWindow, "InterfaceOptionsCheckButtonTemplate")
+    lockCheck:SetPoint("TOPLEFT", optionsWindow, "TOPLEFT", 16, -48)
     lockCheck.Text:SetText("Lock Action Bar")
     lockCheck:SetChecked(p.Locked)
     lockCheck:SetScript("OnClick", function(self)
-        p.Locked = self:GetChecked()
+        GetProfile().Locked = self:GetChecked()
         RefreshLayoutAndLock()
     end)
 
     -- Vertical Checkbox
-    local verticalCheck = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
+    local verticalCheck = CreateFrame("CheckButton", nil, optionsWindow, "InterfaceOptionsCheckButtonTemplate")
     verticalCheck:SetPoint("TOPLEFT", lockCheck, "BOTTOMLEFT", 0, -8)
     verticalCheck.Text:SetText("Align Vertically")
     verticalCheck:SetChecked(p.IsVertical)
     verticalCheck:SetScript("OnClick", function(self)
-        p.IsVertical = self:GetChecked()
+        GetProfile().IsVertical = self:GetChecked()
         UpdateOnUseGear()
     end)
 
     -- Combat Tooltip Checkbox
-    local combatTooltipCheck = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
+    local combatTooltipCheck = CreateFrame("CheckButton", nil, optionsWindow, "InterfaceOptionsCheckButtonTemplate")
     combatTooltipCheck:SetPoint("TOPLEFT", verticalCheck, "BOTTOMLEFT", 0, -8)
     combatTooltipCheck.Text:SetText("Hide Tooltips in Combat")
     combatTooltipCheck:SetChecked(p.HideTooltipInCombat)
@@ -311,7 +334,7 @@ local function CreateOptionsGUI()
     end)
 
     -- Minimap Checkbox
-    local minimapCheck = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
+    local minimapCheck = CreateFrame("CheckButton", nil, optionsWindow, "InterfaceOptionsCheckButtonTemplate")
     minimapCheck:SetPoint("TOPLEFT", combatTooltipCheck, "BOTTOMLEFT", 0, -8)
     minimapCheck.Text:SetText("Hide Minimap Button")
     minimapCheck:SetChecked(OnUseGearDB and OnUseGearDB.minimapButton and OnUseGearDB.minimapButton.hide)
@@ -328,12 +351,12 @@ local function CreateOptionsGUI()
     end)
 
     -- Size Input Label
-    local sizeLabel = optionsPanel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    local sizeLabel = optionsWindow:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     sizeLabel:SetPoint("TOPLEFT", minimapCheck, "BOTTOMLEFT", 4, -20)
     sizeLabel:SetText("Button Size (20 - 80):")
 
     -- Size EditBox
-    local sizeInput = CreateFrame("EditBox", nil, optionsPanel, "InputBoxTemplate")
+    local sizeInput = CreateFrame("EditBox", nil, optionsWindow, "InputBoxTemplate")
     sizeInput:SetSize(50, 20)
     sizeInput:SetPoint("LEFT", sizeLabel, "RIGHT", 10, 0)
     sizeInput:SetAutoFocus(false)
@@ -341,11 +364,12 @@ local function CreateOptionsGUI()
     sizeInput:SetNumber(p.ButtonSize)
 
     local function SaveSizeInput(self)
+        local currentP = GetProfile()
         local val = tonumber(self:GetText())
-        if not val then val = p.ButtonSize end
+        if not val then val = currentP.ButtonSize end
         if val < 20 then val = 20 elseif val > 80 then val = 80 end
         self:SetText(val)
-        p.ButtonSize = val
+        currentP.ButtonSize = val
         UpdateOnUseGear()
     end
 
@@ -358,16 +382,11 @@ local function CreateOptionsGUI()
     end)
 
     -- Profile Selector Dropdown Label
-    local dropdownLabel = optionsPanel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    local dropdownLabel = optionsWindow:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     dropdownLabel:SetPoint("TOPLEFT", sizeLabel, "BOTTOMLEFT", -4, -24)
     dropdownLabel:SetText("Active Profile:")
 
-    -- Integration with standard Settings Dropdown Menu (Dragonflight API)
-    local category = Settings.RegisterCanvasLayoutCategory(optionsPanel, "OnUseGear")
-    OnUseGear_CategoryID = category:GetID()
-    
-    -- Create standard Dropdown for the Canvas Layout (11.0 API)
-    local profileDropdown = CreateFrame("DropdownButton", nil, optionsPanel, "WowStyle1DropdownTemplate")
+    local profileDropdown = CreateFrame("DropdownButton", nil, optionsWindow, "WowStyle1DropdownTemplate")
     profileDropdown:SetPoint("LEFT", dropdownLabel, "RIGHT", 10, 0)
     profileDropdown:SetWidth(150)
     
@@ -380,7 +399,7 @@ local function CreateOptionsGUI()
         OnUseGearDB.charToProfile[myKey] = profileName
         currentProfileKey = profileName
         RefreshLayoutAndLock()
-        if optionsPanel.refresh then optionsPanel.refresh() end
+        if optionsWindow.refresh then optionsWindow.refresh() end
     end
 
     profileDropdown:SetupMenu(function(dropdown, rootDescription)
@@ -392,7 +411,7 @@ local function CreateOptionsGUI()
         end
     end)
 
-    optionsPanel.refresh = function()
+    optionsWindow.refresh = function()
         local currentP = GetProfile()
         lockCheck:SetChecked(currentP.Locked)
         verticalCheck:SetChecked(currentP.IsVertical)
@@ -404,13 +423,19 @@ local function CreateOptionsGUI()
         end
     end
 
-    optionsPanel:HookScript("OnShow", function()
-        if optionsPanel.refresh then
-            optionsPanel.refresh()
+    optionsWindow:HookScript("OnShow", function()
+        if optionsWindow.refresh then
+            optionsWindow.refresh()
         end
     end)
+end
 
-    Settings.RegisterAddOnCategory(category)
+ns.ToggleOptionsWindow = function()
+    if optionsWindow:IsShown() then
+        optionsWindow:Hide()
+    else
+        optionsWindow:Show()
+    end
 end
 
 -------------------------------------------------------------------------------
@@ -423,7 +448,7 @@ SlashCmdList["OnUseGear"] = function(msg)
         p.Locked = not p.Locked
         RefreshLayoutAndLock()
     else
-        Settings.OpenToCategory(OnUseGear_CategoryID)
+        optionsWindow:Show()
     end
 end
 

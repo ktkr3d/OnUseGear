@@ -1,6 +1,6 @@
-## Interface: 16001, 120100
+## Interface: 16001, 120105
 ## Title: OnUseGear
-## Version: v0.1.7
+## Version: v0.1.8
 ## Notes: An add-on for equipped gear with on-use effects
 ## Author: ktkr3d
 ## IconTexture: Interface\Icons\Achievement_Reputation_Kirintor

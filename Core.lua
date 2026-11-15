@@ -268,6 +268,7 @@ end
 -- GUI Options Settings Panel
 -------------------------------------------------------------------------------
 local optionsWindow = CreateFrame("Frame", "OnUseGearOptionsWindow", UIParent, "BasicFrameTemplateWithInset")
+table.insert(UISpecialFrames, "OnUseGearOptionsWindow")
 optionsWindow:SetSize(420, 300)
 optionsWindow:SetPoint("CENTER")
 optionsWindow:SetFrameStrata("DIALOG")
@@ -405,7 +406,12 @@ local function CreateOptionsGUI()
     profileDropdown:SetupMenu(function(dropdown, rootDescription)
         rootDescription:CreateTitle("Select a Profile")
         if OnUseGearDB and OnUseGearDB.profiles then
+            local profileNames = {}
             for profileName in pairs(OnUseGearDB.profiles) do
+                table.insert(profileNames, profileName)
+            end
+            table.sort(profileNames)
+            for _, profileName in ipairs(profileNames) do
                 rootDescription:CreateRadio(profileName, IsProfileSelected, SetProfileSelected, profileName)
             end
         end
